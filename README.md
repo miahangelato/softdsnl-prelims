@@ -1,30 +1,93 @@
-# 📊 Activity 2: Build a Custom Dataset and Expose a Machine Learning API
+# 🎓 Final Prelim Activity: Build a Machine Learning API with Your Own Dataset
 
-## 🕒 Time: ~2 hours
+## 🧠 Objective
+
+This activity is your final output for the Prelims. You will:
+
+- Create or collect your own dataset (minimum 50 rows and 3 features)
+- Visualize your dataset using **at least three types of visualizations**
+- Train a machine learning model using **scikit-learn**
+- Save the trained model and label encoder using **joblib**
+- Build a Django REST API that serves predictions based on your model
+- Test the API using **Postman**
+- Submit a well-documented GitHub repository
 
 ---
 
-## 🎯 Objectives
+## ✅ Requirements
 
-- Create your own labeled dataset and save it as a `.csv` file
-- Load and visualize your dataset using Python
-- Train a classifier using `scikit-learn`
-- Save the model and label encoder to `.pkl` files
-- Create a Django REST API that accepts input and returns predictions
+### 📊 Dataset
+
+- Minimum of **50 rows**
+- At least **3 numeric features**
+- One target column (label/class to predict)
+- Can be:
+  - Created manually (CSV)
+  - Collected from a public source (e.g., UCI, Kaggle)
+  - Synthesized or simulated (e.g., random numeric traits and labels)
+- Save the file as `dataset.csv`
 
 ---
 
-## 💻 Project Folder Structure
+### 📈 Visualizations
+
+You must include **at least 3 different visualizations**, such as:
+- Histogram
+- Pairplot
+- Correlation heatmap
+- Boxplot
+- Scatterplot
+- Confusion matrix (for classification)
+
+Use any combination of `matplotlib`, `seaborn`, or `pandas`.
+
+---
+
+### 🧪 Model Training
+
+Create a script named `train_model.py` that:
+- Loads the dataset from `dataset.csv`
+- Encodes the label if needed (using `LabelEncoder`)
+- Trains a model (e.g., RandomForestClassifier or other)
+- Saves the trained model as `model.pkl`
+- Saves the label encoder as `label_encoder.pkl` (if applicable)
+- Generates and saves visualizations (optional)
+
+---
+
+### 🌐 Django API
+
+Build a Django REST API with the following:
+
+- A single endpoint: `POST /api/predict/`
+- Accepts 3 feature inputs via JSON
+- Loads `model.pkl` and `label_encoder.pkl`
+- Returns a prediction (decoded label or numeric value)
+
+Use Django REST Framework for the API logic.
+
+You do **not** need to deploy the API. Just run locally and test with Postman.
+
+---
+
+## 📁 Recommended Folder Structure
 
 ```
-ml-custom-dataset/
-├── my_dataset.csv                  <-- Your custom dataset
-├── train_model.py                  <-- Trains model, saves .pkl files
-├── predict.py                      <-- CLI tester for predictions
-├── requirements.txt
-├── README.md
-├── report/                         <-- Screenshots folder
-└── ml_api_project/                 <-- Your Django project
+final-ml-api-project/
+├── dataset.csv                   # Your dataset
+├── train_model.py                # Loads data, visualizes, trains and saves model
+├── model.pkl                     # Saved model
+├── label_encoder.pkl             # Saved label encoder (if used)
+├── requirements.txt              # All libraries used
+├── README.md                     # This file
+├── report/                       # Screenshots folder
+│   ├── visualization1.png
+│   ├── visualization2.png
+│   ├── visualization3.png
+│   ├── postman1.png
+│   ├── postman2.png
+│   └── ...
+└── ml_api_project/               # Django REST API project
     ├── manage.py
     ├── ml_api_project/
     │   ├── settings.py
@@ -33,266 +96,111 @@ ml-custom-dataset/
         ├── views.py
         ├── urls.py
         ├── apps.py
-        └── __init__.py
+        └── ...
 ```
 
 ---
 
-## 🛠️ Part 1: Dataset and Model
+## 🧪 Sample Postman Test
 
-### 1. Create Your Project Folder
+POST to: `http://localhost:8000/api/predict/`
+
+**JSON body example:**
+```json
+{
+  "feature1": 5.1,
+  "feature2": 3.5,
+  "feature3": 1.4
+}
+```
+
+**Sample response:**
+```json
+{
+  "prediction": "setosa"
+}
+```
+
+Take at least **2–3 screenshots** of valid request/response results and include them in the `report/` folder or embed them in the README.
+
+---
+
+## 📝 What to Submit
+
+- A GitHub repository with:
+  - `dataset.csv`
+  - `train_model.py`
+  - Saved `.pkl` files
+  - Working Django project with API
+  - `requirements.txt`
+  - At least 3 visualizations
+  - A `report/` folder or embedded screenshots in the README
+  - This completed `README.md`
+
+---
+
+## 📄 README Format (this file)
+
+Make sure your `README.md` includes the following:
+
+- **Project Title and Description**
+- **Description of your dataset**
+- **Description of features and target label**
+- **Screenshots of visualizations (or linked images from `report/`)**
+- **Sample API input/output (Postman screenshots or JSON)**
+- **Reflection answers:**
+  - Why did you choose this dataset?
+  - What did you learn?
+  - What were the challenges you encountered?
+  - How would you improve your project?
+
+---
+
+## 📦 How to Run
+
+### 1. Create a virtual environment (optional but recommended)
 
 ```bash
-mkdir ml-custom-dataset
-cd ml-custom-dataset
+python -m venv venv
+venv\Scripts\activate       # Windows
+source venv/bin/activate    # Mac/Linux
 ```
 
----
-
-### 2. Create Your Dataset in Excel or Sheets
-
-Example (at least 2 numeric features and 1 label):
-
-```
-petal_length,petal_width,species
-1.4,0.2,setosa
-4.7,1.4,versicolor
-5.5,2.1,virginica
-```
-
-Save as `my_dataset.csv`.
-
----
-
-### 3. Create `requirements.txt`
-
-```txt
-pandas
-matplotlib
-seaborn
-scikit-learn
-joblib
-djangorestframework
-```
-
-Install everything:
+### 2. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
----
-
-### 4. Create `train_model.py`
-
-```python
-# train_model.py
-
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import LabelEncoder
-import joblib
-
-df = pd.read_csv("my_dataset.csv")
-
-sns.scatterplot(data=df, x="petal_length", y="petal_width", hue="species")
-plt.title("Custom Dataset")
-plt.show()
-
-X = df[["petal_length", "petal_width"]]
-le = LabelEncoder()
-y = le.fit_transform(df["species"])
-
-model = RandomForestClassifier()
-model.fit(X, y)
-
-joblib.dump(model, "model.pkl")
-joblib.dump(le, "label_encoder.pkl")
-print("✅ Model trained and saved.")
-```
-
----
-
-### 5. Create `predict.py`
-
-```python
-# predict.py
-
-import joblib
-
-model = joblib.load("model.pkl")
-le = joblib.load("label_encoder.pkl")
-
-sample = [[5.5, 2.1]]
-prediction = model.predict(sample)
-print("Prediction:", le.inverse_transform(prediction)[0])
-```
-
----
-
-## 🌐 Part 2: Django API Setup
-
----
-
-### 1. Create Django Project and App
+### 3. Train the model
 
 ```bash
-django-admin startproject ml_api_project .
-python manage.py startapp ml_api
+python train_model.py
 ```
 
----
-
-### 2. Update `ml_api_project/settings.py`
-
-```python
-INSTALLED_APPS = [
-    ...
-    'rest_framework',
-    'ml_api',
-]
-```
-
----
-
-### 3. Create `ml_api/urls.py`
-
-```python
-from django.urls import path
-from .views import PredictView
-
-urlpatterns = [
-    path('predict/', PredictView.as_view(), name='predict'),
-]
-```
-
----
-
-### 4. Update `ml_api_project/urls.py`
-
-```python
-from django.contrib import admin
-from django.urls import path, include
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include('ml_api.urls')),
-]
-```
-
----
-
-### 5. Create `ml_api/views.py`
-
-```python
-# ml_api/views.py
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-import joblib
-
-model = joblib.load("model.pkl")
-label_encoder = joblib.load("label_encoder.pkl")
-
-class PredictView(APIView):
-    def post(self, request):
-        try:
-            petal_length = float(request.data.get("petal_length"))
-            petal_width = float(request.data.get("petal_width"))
-
-            prediction = model.predict([[petal_length, petal_width]])
-            label = label_encoder.inverse_transform(prediction)[0]
-
-            return Response({"prediction": label})
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-```
-
----
-
-### 6. Run Server
+### 4. Run the Django server
 
 ```bash
+cd ml_api_project
 python manage.py runserver
 ```
 
-Test via Postman:
-- POST to `http://localhost:8000/api/predict/`
-- Body (JSON):
+---
 
-```json
-{
-  "petal_length": 5.5,
-  "petal_width": 2.1
-}
-```
+## 🧠 Grading Rubric (100 pts)
+
+| Criteria                                  | Points |
+|-------------------------------------------|--------|
+| Dataset meets requirements                | 15     |
+| At least 3 unique visualizations included | 20     |
+| Model trains and saves correctly          | 15     |
+| API works and returns correct prediction  | 25     |
+| At least 2 working Postman tests          | 10     |
+| Organized project structure               | 5      |
+| README documentation                      | 5      |
+| Reflection answers                        | 5      |
+| **TOTAL**                                 | **100** |
 
 ---
 
-## 📄 Final Report Format
-
-### ✅ Submit: GitHub Repo + Screenshot Folder or README
-
-**Repo name:** `ml-custom-dataset`
-
-**Expected Files:**
-
-| File                     | Description                          |
-|--------------------------|--------------------------------------|
-| `my_dataset.csv`         | Your custom dataset                  |
-| `train_model.py`         | Trains and saves model               |
-| `predict.py`             | Optional CLI test                    |
-| `ml_api_project/`        | Django project for the API           |
-| `README.md`              | Final writeup and summary            |
-| `report/` folder         | Screenshots (optional)               |
-
----
-
-### 📷 Screenshots to Include
-
-| Screenshot Topic              | Description                                 |
-|-------------------------------|---------------------------------------------|
-| 1. Raw dataset                | CSV file shown in Excel or Sheets           |
-| 2. pandas preview             | `print(df.head())` from `train_model.py`    |
-| 3. Visualization              | Scatterplot or seaborn output               |
-| 4. Training output            | CLI print confirming model was trained      |
-| 5–7. Sample predictions       | Postman or `predict.py` outputs             |
-| 8–10. API response screenshots| Postman request/response to your API        |
-
----
-
-### 📝 `README.md` Should Include:
-
-- Description of your dataset
-- Features and label used
-- Classifier used
-- Sample inputs and predictions
-- How to run `train_model.py`, Django server, and test the API
-
----
-
-## ✅ Grading Guide
-
-| Criteria                             | Points |
-|--------------------------------------|--------|
-| Dataset Created and Loaded Correctly | 20     |
-| Visualization with Plot              | 20     |
-| Model Training                       | 20     |
-| API Working with Prediction Output   | 20     |
-| Organized Repo + Report              | 20     |
-| **TOTAL**                            | **100**|
-
----
-
-## 🎉 Final Words
-
-You’ve just gone full circle:
-- Designed your own data
-- Visualized it
-- Trained an ML model
-- Exposed it as a live prediction API
-
-This is a **mini real-world ML project** — great job!
+## 🙌 Good luck, and build something you're proud of!
